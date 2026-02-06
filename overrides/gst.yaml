@@ -1,0 +1,7 @@
+package: gst
+namespace: Gst
+
+appends:
+  constants: |
+    // ClockTimeNone represents GST_CLOCK_TIME_NONE — an undefined clock time value.
+    const ClockTimeNone ClockTime = 0xffffffffffffffff
