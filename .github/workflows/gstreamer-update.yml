@@ -59,6 +59,16 @@ jobs:
             gir1.2-gstreamer-1.0 \
             gir1.2-gst-plugins-base-1.0
 
+      - name: Build generator
+        if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
+        run: cd cmd/gst-bindgen && go build -o ../../gst-bindgen .
+
+      - name: Save old generated files
+        if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
+        run: |
+          mkdir -p /tmp/old-gst
+          cp -r gst/ /tmp/old-gst/
+
       - name: Update GIR files
         if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
         run: |
@@ -75,10 +85,83 @@ jobs:
       - name: Regenerate bindings
         if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
         run: |
-          cd cmd/gst-bindgen && go build -o ../../gst-bindgen .
-          cd ../..
           ./gst-bindgen generate --gir-dir=gir-files/ --output-dir=. --overrides-dir=overrides/
-          rm -f gst-bindgen
+
+      - name: Determine update kind
+        id: semver
+        if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
+        run: |
+          OLD="${{ steps.version.outputs.current }}"
+          NEW="${{ steps.version.outputs.latest }}"
+          OLD_MAJOR=$(echo "$OLD" | cut -d. -f1)
+          NEW_MAJOR=$(echo "$NEW" | cut -d. -f1)
+          OLD_MINOR=$(echo "$OLD" | cut -d. -f2)
+          NEW_MINOR=$(echo "$NEW" | cut -d. -f2)
+
+          if [ "$OLD_MAJOR" != "$NEW_MAJOR" ]; then
+            echo "kind=major" >> "$GITHUB_OUTPUT"
+          elif [ "$OLD_MINOR" != "$NEW_MINOR" ]; then
+            echo "kind=minor" >> "$GITHUB_OUTPUT"
+          else
+            echo "kind=patch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for API breaking changes
+        id: api-check
+        if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
+        run: |
+          # Run check-api; exit code 2 = breaking changes found, 0 = none.
+          set +e
+          ./gst-bindgen check-api \
+            --old-dir=/tmp/old-gst \
+            --new-dir=. \
+            --old-version="${{ steps.version.outputs.current }}" \
+            --new-version="${{ steps.version.outputs.latest }}" \
+            --format=text
+          API_EXIT=$?
+          set -e
+
+          if [ "$API_EXIT" -eq 2 ]; then
+            echo "has_breaking=true" >> "$GITHUB_OUTPUT"
+          elif [ "$API_EXIT" -eq 0 ]; then
+            echo "has_breaking=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "API check failed with exit code $API_EXIT"
+            exit 1
+          fi
+
+          # Generate markdown report for PR body.
+          ./gst-bindgen check-api \
+            --old-dir=/tmp/old-gst \
+            --new-dir=. \
+            --old-version="${{ steps.version.outputs.current }}" \
+            --new-version="${{ steps.version.outputs.latest }}" \
+            --format=markdown > /tmp/api-report.md 2>/dev/null || true
+
+          {
+            echo "report<<APIDIFF_EOF"
+            cat /tmp/api-report.md
+            echo "APIDIFF_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Fail if minor/patch has breaking changes
+        if: |
+          steps.version.outputs.current != steps.version.outputs.latest &&
+          steps.version.outputs.latest != '' &&
+          steps.semver.outputs.kind != 'major' &&
+          steps.api-check.outputs.has_breaking == 'true'
+        run: |
+          echo "::error::Breaking changes detected in a ${{ steps.semver.outputs.kind }} GStreamer update (${{ steps.version.outputs.current }} -> ${{ steps.version.outputs.latest }})"
+          echo ""
+          echo "Minor/patch releases must not introduce breaking changes to the Go API."
+          echo ""
+          cat /tmp/api-report.md
+          echo ""
+          echo "Please investigate whether:"
+          echo "  1. The GIR file changes are intentional upstream"
+          echo "  2. The generator has a bug producing different output"
+          echo "  3. The overrides need adjustment to preserve the API"
+          exit 1
 
       - name: Create Pull Request
         if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
@@ -87,9 +170,20 @@ jobs:
           title: "Update bindings for GStreamer ${{ steps.version.outputs.latest }}"
           branch: "auto/gstreamer-${{ steps.version.outputs.latest }}"
           body: |
-            Automated update of GStreamer bindings from version ${{ steps.version.outputs.current }} to ${{ steps.version.outputs.latest }}.
+            Automated update of GStreamer bindings from `${{ steps.version.outputs.current }}` to `${{ steps.version.outputs.latest }}`.
 
-            This PR was created automatically by the GStreamer update workflow.
+            **Update type:** `${{ steps.semver.outputs.kind }}`
+
+            ## API Changes
+
+            ${{ steps.api-check.outputs.has_breaking == 'true' && '> :warning: **This update contains breaking changes.** Review carefully before merging.' || '> :white_check_mark: No breaking API changes detected.' }}
+
+            <details>
+            <summary>Full API diff report</summary>
+
+            ${{ steps.api-check.outputs.report }}
+
+            </details>
 
             ## Changes
             - Updated GIR files from system packages
@@ -101,3 +195,10 @@ jobs:
             - [ ] `go vet ./gst/...` has no warnings
           commit-message: "Update bindings for GStreamer ${{ steps.version.outputs.latest }}"
           delete-branch: true
+          labels: |
+            automated
+            ${{ steps.api-check.outputs.has_breaking == 'true' && 'breaking-change' || '' }}
+
+      - name: Clean up
+        if: always()
+        run: rm -f gst-bindgen
