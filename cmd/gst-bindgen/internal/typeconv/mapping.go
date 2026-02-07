@@ -61,6 +61,12 @@ var PrimitiveConversions = map[string]CTypeToGoConversion{
 		NeedsDefer: true,
 		DeferCode:  "C.free(unsafe.Pointer({{.CName}}))",
 	},
+	"filename": {
+		ToC:        "C.CString({{.Name}})",
+		ToGo:       "C.GoString({{.Name}})",
+		NeedsDefer: true,
+		DeferCode:  "C.free(unsafe.Pointer({{.CName}}))",
+	},
 	"gboolean": {
 		ToC:  "gboolean({{.Name}})",
 		ToGo: "gobool({{.Name}})",

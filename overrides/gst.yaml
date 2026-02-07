@@ -1,6 +1,97 @@
 package: gst
 namespace: Gst
 
+# Types that have hand-written bindings and should not be generated.
+skip_types:
+  # GObject types
+  - Allocator
+  - Bin
+  - BufferPool
+  - Bus
+  - Clock
+  - ControlBinding
+  - ControlSource
+  - Device
+  - DeviceMonitor
+  - DeviceProvider
+  - Element
+  - ElementFactory
+  - GhostPad
+  - Object
+  - Pad
+  - PadTemplate
+  - Pipeline
+  - Plugin
+  - PluginFeature
+  - ProxyPad
+  - Registry
+  - Stream
+  - StreamCollection
+  - SystemClock
+  - Task
+  - TaskPool
+  - TypeFindFactory
+  # MiniObject types
+  - Buffer
+  - BufferList
+  - Caps
+  - CapsFeatures
+  - Context
+  - Event
+  - Memory
+  - Message
+  - Meta
+  - MetaInfo
+  - MiniObject
+  - Query
+  - Sample
+  - Segment
+  - Structure
+  - TagList
+  - Toc
+  - TocEntry
+  # Other records/types
+  - AllocationParams
+  - ChildProxy
+  - DebugCategory
+  - Iterator
+  - MapInfo
+  - Promise
+  - URIHandler
+  - Uri
+
+# Functions that should not be generated (custom init logic, etc.)
+skip_functions:
+  - init
+  - init_check
+  - deinit
+  - version
+  - version_string
+
+# Methods that remain hand-written
+skip_methods:
+  Object:
+    - set_property
+    - get_property
+
+# Override default cast macros for types that use _CAST variants
+cast_macros:
+  GstAllocator: "GST_ALLOCATOR_CAST"
+  GstContext: "GST_CONTEXT_CAST"
+  GstDevice: "GST_DEVICE_CAST"
+  GstDeviceProvider: "GST_DEVICE_PROVIDER_CAST"
+  GstMemory: "GST_MEMORY_CAST"
+  GstMeta: "GST_META_CAST"
+  GstStream: "GST_STREAM_CAST"
+  GstStreamCollection: "GST_STREAM_COLLECTION_CAST"
+  GstTask: "GST_TASK_CAST"
+  GstTaskPool: "GST_TASK_POOL_CAST"
+
+# Extra fields for mini-object types
+miniobject_extra_fields:
+  Buffer:
+    - { name: "mapInfo", type: "*MapInfo" }
+
 appends:
   constants: |
     // ClockTimeNone represents GST_CLOCK_TIME_NONE — an undefined clock time value.

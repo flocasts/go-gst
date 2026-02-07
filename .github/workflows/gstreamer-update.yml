@@ -1,0 +1,103 @@
+name: Detect GStreamer Update
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly Monday 6AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for new GStreamer tag
+        id: version
+        run: |
+          CURRENT=$(cat gir-files/VERSION)
+          # GStreamer monorepo uses tags — query via GitLab API.
+          # Filter for stable releases (even minor version, X.Y.Z format).
+          LATEST=$(curl -s "https://gitlab.freedesktop.org/api/v4/projects/gstreamer%2Fgstreamer/repository/tags?per_page=100&search=1." \
+            | python3 -c "
+          import json, sys, re
+          tags = json.load(sys.stdin)
+          releases = []
+          for t in tags:
+              m = re.match(r'^(\d+)\.(\d+)\.(\d+)$', t['name'])
+              if m and int(m.group(2)) % 2 == 0:
+                  releases.append(t['name'])
+          releases.sort(key=lambda v: list(map(int, v.split('.'))), reverse=True)
+          print(releases[0] if releases else '')
+          ")
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+          if [ "$CURRENT" = "$LATEST" ]; then
+            echo "Already up to date ($CURRENT)"
+          else
+            echo "New version available: $CURRENT -> $LATEST"
+          fi
+
+      - name: Set up Go
+        if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+
+      - name: Install GStreamer
+        if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgstreamer1.0-dev \
+            libgstreamer-plugins-base1.0-dev \
+            gstreamer1.0-plugins-base \
+            libgstreamer-plugins-bad1.0-dev \
+            gir1.2-gstreamer-1.0 \
+            gir1.2-gst-plugins-base-1.0
+
+      - name: Update GIR files
+        if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
+        run: |
+          # Copy system GIR files into the repo.
+          GIR_SRC="/usr/share/gir-1.0"
+          for f in gir-files/*.gir; do
+            BASENAME=$(basename "$f")
+            if [ -f "$GIR_SRC/$BASENAME" ]; then
+              cp "$GIR_SRC/$BASENAME" "gir-files/$BASENAME"
+            fi
+          done
+          echo "${{ steps.version.outputs.latest }}" > gir-files/VERSION
+
+      - name: Regenerate bindings
+        if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
+        run: |
+          cd cmd/gst-bindgen && go build -o ../../gst-bindgen .
+          cd ../..
+          ./gst-bindgen generate --gir-dir=gir-files/ --output-dir=. --overrides-dir=overrides/
+          rm -f gst-bindgen
+
+      - name: Create Pull Request
+        if: steps.version.outputs.current != steps.version.outputs.latest && steps.version.outputs.latest != ''
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "Update bindings for GStreamer ${{ steps.version.outputs.latest }}"
+          branch: "auto/gstreamer-${{ steps.version.outputs.latest }}"
+          body: |
+            Automated update of GStreamer bindings from version ${{ steps.version.outputs.current }} to ${{ steps.version.outputs.latest }}.
+
+            This PR was created automatically by the GStreamer update workflow.
+
+            ## Changes
+            - Updated GIR files from system packages
+            - Regenerated Go bindings using `gst-bindgen generate`
+
+            ## Verification
+            - [ ] `go build ./gst/...` compiles
+            - [ ] `go test ./gst/...` passes
+            - [ ] `go vet ./gst/...` has no warnings
+          commit-message: "Update bindings for GStreamer ${{ steps.version.outputs.latest }}"
+          delete-branch: true

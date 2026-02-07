@@ -162,14 +162,36 @@ func (r *TypeRegistry) registerRecord(nsName string, rec *Record) {
 	}
 }
 
-// isMiniObjectRecord checks if a record represents a GStreamer mini-object
-// by looking for a field named "mini_object" with type "MiniObject".
+// isMiniObjectRecord checks if a record represents a GStreamer mini-object.
+// Detection strategy:
+//  1. Check for a field named "mini_object" with type "MiniObject" (non-opaque records).
+//  2. For opaque records (no fields), check if the record has a glib:get-type and
+//     has both "ref" and "unref" methods (characteristic of mini-objects).
 func isMiniObjectRecord(rec *Record) bool {
+	// Strategy 1: explicit mini_object field.
 	for _, field := range rec.Fields {
 		if field.Name == "mini_object" && field.Type != nil && field.Type.Name == "MiniObject" {
 			return true
 		}
 	}
+
+	// Strategy 2: opaque record with glib:get-type + ref/unref methods.
+	if rec.GLibGetType != "" && len(rec.Fields) == 0 {
+		hasRef := false
+		hasUnref := false
+		for _, m := range rec.Methods {
+			if m.Name == "ref" {
+				hasRef = true
+			}
+			if m.Name == "unref" {
+				hasUnref = true
+			}
+		}
+		if hasRef && hasUnref {
+			return true
+		}
+	}
+
 	return false
 }
 
@@ -282,9 +304,14 @@ func (r *TypeRegistry) findClassParent(nsName, className string) string {
 	return ""
 }
 
-// qualifyName resolves a potentially unqualified GIR type name to a fully qualified one.
+// QualifyName resolves a potentially unqualified GIR type name to a fully qualified one.
 // If the name already contains a dot, it's already qualified.
 // Otherwise, it's assumed to be in the given default namespace.
+func (r *TypeRegistry) QualifyName(defaultNS, name string) string {
+	return r.qualifyName(defaultNS, name)
+}
+
+// qualifyName resolves a potentially unqualified GIR type name to a fully qualified one.
 func (r *TypeRegistry) qualifyName(defaultNS, name string) string {
 	if strings.Contains(name, ".") {
 		return name
@@ -375,6 +402,76 @@ func (r *TypeRegistry) FindEnumByName(nsName, name string) (*Enumeration, error)
 		}
 	}
 	return nil, fmt.Errorf("enumeration %s.%s not found", nsName, name)
+}
+
+// FindRecord looks up a record by fully qualified name (e.g., "Gst.Buffer").
+func (r *TypeRegistry) FindRecord(qualifiedName string) *Record {
+	parts := strings.SplitN(qualifiedName, ".", 2)
+	if len(parts) != 2 {
+		return nil
+	}
+	nsName, recName := parts[0], parts[1]
+	for _, repo := range r.repositories {
+		if repo.Namespace.Name != nsName {
+			continue
+		}
+		for i := range repo.Namespace.Records {
+			if repo.Namespace.Records[i].Name == recName {
+				return &repo.Namespace.Records[i]
+			}
+		}
+	}
+	return nil
+}
+
+// FindRecordByName finds a record by namespace and name.
+func (r *TypeRegistry) FindRecordByName(nsName, name string) *Record {
+	for _, repo := range r.repositories {
+		if repo.Namespace.Name != nsName {
+			continue
+		}
+		for i := range repo.Namespace.Records {
+			if repo.Namespace.Records[i].Name == name {
+				return &repo.Namespace.Records[i]
+			}
+		}
+	}
+	return nil
+}
+
+// FindInterface looks up an interface by fully qualified name.
+func (r *TypeRegistry) FindInterface(qualifiedName string) *Interface {
+	parts := strings.SplitN(qualifiedName, ".", 2)
+	if len(parts) != 2 {
+		return nil
+	}
+	nsName, ifaceName := parts[0], parts[1]
+	for _, repo := range r.repositories {
+		if repo.Namespace.Name != nsName {
+			continue
+		}
+		for i := range repo.Namespace.Interfaces {
+			if repo.Namespace.Interfaces[i].Name == ifaceName {
+				return &repo.Namespace.Interfaces[i]
+			}
+		}
+	}
+	return nil
+}
+
+// FindClassByName finds a class by namespace and name.
+func (r *TypeRegistry) FindClassByName(nsName, name string) *Class {
+	for _, repo := range r.repositories {
+		if repo.Namespace.Name != nsName {
+			continue
+		}
+		for i := range repo.Namespace.Classes {
+			if repo.Namespace.Classes[i].Name == name {
+				return &repo.Namespace.Classes[i]
+			}
+		}
+	}
+	return nil
 }
 
 // FindBitfieldByName finds a bitfield by namespace and name.

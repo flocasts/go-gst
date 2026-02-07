@@ -138,8 +138,42 @@ func generatePackage(cfg *Config, pkg PackageConfig, registry *girparser.TypeReg
 		return fmt.Errorf("generating enums: %w", err)
 	}
 
-	// Future phases will add more generation steps here.
+	// Phase 2: Generate C cast helpers (must come before types since types reference them).
+	if err := generateCHelpers(ctx); err != nil {
+		return fmt.Errorf("generating C helpers: %w", err)
+	}
 
+	// Phase 2: Generate GObject type scaffolding.
+	if err := generateTypes(ctx); err != nil {
+		return fmt.Errorf("generating types: %w", err)
+	}
+
+	// Phase 3: Generate MiniObject type scaffolding.
+	if err := generateMiniObjects(ctx); err != nil {
+		return fmt.Errorf("generating mini-objects: %w", err)
+	}
+
+	// Phase 2/3: Generate GValue marshalers.
+	if err := generateMarshalers(ctx); err != nil {
+		return fmt.Errorf("generating marshalers: %w", err)
+	}
+
+	// Phase 4: Generate methods.
+	if err := generateMethods(ctx); err != nil {
+		return fmt.Errorf("generating methods: %w", err)
+	}
+
+	// Phase 5: Generate standalone functions and constructors.
+	if err := generateFunctions(ctx); err != nil {
+		return fmt.Errorf("generating functions: %w", err)
+	}
+
+	// Phase 6: Generate callback types and signal connections.
+	if err := generateCallbacks(ctx); err != nil {
+		return fmt.Errorf("generating callbacks: %w", err)
+	}
+
+	fmt.Fprintf(os.Stderr, "  generated %s\n", pkg.GoPackage)
 	return nil
 }
 

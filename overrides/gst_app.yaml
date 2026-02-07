@@ -1,0 +1,7 @@
+package: app
+namespace: GstApp
+
+# Types with hand-written bindings
+skip_types:
+  - AppSink
+  - AppSrc

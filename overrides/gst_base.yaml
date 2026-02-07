@@ -1,0 +1,14 @@
+package: base
+namespace: GstBase
+
+# Types with hand-written bindings
+skip_types:
+  - BaseSink
+  - BaseSrc
+  - BaseTransform
+  - CollectPads
+  - PushSrc
+
+cast_macros:
+  GstBaseSink: "GST_BASE_SINK_CAST"
+  GstBaseSrc: "GST_BASE_SRC_CAST"
