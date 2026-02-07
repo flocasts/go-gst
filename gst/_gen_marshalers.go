@@ -18,7 +18,6 @@ func init() { registerGeneratedMarshalers() }
 func registerGeneratedMarshalers() {
 	tm := []glib.TypeMarshaler{
 		{T: glib.Type(C.gst_atomic_queue_get_type()), F: marshalAtomicQueue},
-		{T: glib.Type(C.gst_bitmask_get_type()), F: marshalBitmask},
 		{T: glib.Type(C.gst_date_time_get_type()), F: marshalDateTime},
 		{T: glib.Type(C.gst_device_provider_factory_get_type()), F: marshalDeviceProviderFactory},
 		{T: glib.Type(C.gst_double_range_get_type()), F: marshalDoubleRange},
@@ -32,7 +31,6 @@ func registerGeneratedMarshalers() {
 		{T: glib.Type(C.gst_param_spec_array_get_type()), F: marshalParamArray},
 		{T: glib.Type(C.gst_param_spec_fraction_get_type()), F: marshalParamFraction},
 		{T: glib.Type(C.gst_shared_task_pool_get_type()), F: marshalSharedTaskPool},
-		{T: glib.Type(C.gst_tracer_get_type()), F: marshalTracer},
 		{T: glib.Type(C.gst_tracer_factory_get_type()), F: marshalTracerFactory},
 		{T: glib.Type(C.gst_tracer_record_get_type()), F: marshalTracerRecord},
 		{T: glib.Type(C.gst_value_array_get_type()), F: marshalValueArray},
@@ -49,12 +47,6 @@ func toGValue(p unsafe.Pointer) *C.GValue {
 func marshalAtomicQueue(p unsafe.Pointer) (interface{}, error) {
 	c := C.g_value_get_boxed(toGValue(p))
 	return wrapAtomicQueue((*C.GstAtomicQueue)(unsafe.Pointer(c))), nil
-}
-
-func marshalBitmask(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapBitmask(obj), nil
 }
 
 func marshalDateTime(p unsafe.Pointer) (interface{}, error) {
@@ -132,12 +124,6 @@ func marshalSharedTaskPool(p unsafe.Pointer) (interface{}, error) {
 	c := C.g_value_get_object(toGValue(p))
 	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
 	return wrapSharedTaskPool(obj), nil
-}
-
-func marshalTracer(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapTracer(obj), nil
 }
 
 func marshalTracerFactory(p unsafe.Pointer) (interface{}, error) {

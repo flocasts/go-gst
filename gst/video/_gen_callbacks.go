@@ -52,8 +52,3 @@ type VideoFormatUnpack func(info VideoFormatInfo, flags VideoPackFlags, dest uns
 
 type VideoGLTextureUpload func(meta VideoGLTextureUploadMeta, texture_id uint) bool
 
-// ConnectValueChanged: Fired when the value of the indicated channel has changed.
-func (c *ColorBalanceChannel) ConnectValueChanged(f func(value int)) glib.SignalHandle {
-	return c.Connect("value-changed", f)
-}
-

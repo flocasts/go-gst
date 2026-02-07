@@ -7,4 +7,3 @@ GstAggregator *                toGstAggregator(void *p) { return (GST_AGGREGATOR
 GstAggregatorPad *             toGstAggregatorPad(void *p) { return (GST_AGGREGATOR_PAD(p)); }
 GstBaseParse *                 toGstBaseParse(void *p) { return (GST_BASE_PARSE(p)); }
 GstDataQueue *                 toGstDataQueue(void *p) { return (GST_DATA_QUEUE(p)); }
-GstFlowCombiner *              toGstFlowCombiner(void *p) { return (GST_FLOW_COMBINER(p)); }

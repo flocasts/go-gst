@@ -3,7 +3,6 @@
 #include "_gen_chelpers.go.h"
 
 GstAtomicQueue *               toGstAtomicQueue(void *p) { return (GST_ATOMIC_QUEUE(p)); }
-GstBitmask *                   toGstBitmask(void *p) { return (GST_BITMASK(p)); }
 GstDateTime *                  toGstDateTime(void *p) { return (GST_DATE_TIME(p)); }
 GstDeviceProviderFactory *     toGstDeviceProviderFactory(void *p) { return (GST_DEVICE_PROVIDER_FACTORY(p)); }
 GstDoubleRange *               toGstDoubleRange(void *p) { return (GST_DOUBLE_RANGE(p)); }
@@ -17,7 +16,6 @@ GstMetaFactory *               toGstMetaFactory(void *p) { return (GST_META_FACT
 GstParamArray *                toGstParamArray(void *p) { return (GST_PARAM_ARRAY(p)); }
 GstParamFraction *             toGstParamFraction(void *p) { return (GST_PARAM_FRACTION(p)); }
 GstSharedTaskPool *            toGstSharedTaskPool(void *p) { return (GST_SHARED_TASK_POOL(p)); }
-GstTracer *                    toGstTracer(void *p) { return (GST_TRACER(p)); }
 GstTracerFactory *             toGstTracerFactory(void *p) { return (GST_TRACER_FACTORY(p)); }
 GstTracerRecord *              toGstTracerRecord(void *p) { return (GST_TRACER_RECORD(p)); }
 GstValueArray *                toGstValueArray(void *p) { return (GST_VALUE_ARRAY(p)); }

@@ -50,6 +50,9 @@ skip_types:
   - TagList
   - Toc
   - TocEntry
+  # Types with hand-written definitions
+  - Bitmask
+  - Tracer
   # Other records/types
   - AllocationParams
   - ChildProxy

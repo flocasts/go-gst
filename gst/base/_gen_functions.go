@@ -102,9 +102,3 @@ func NewAdapter() *Adapter {
 	return FromGstAdapterUnsafeFull(unsafe.Pointer(cResult))
 }
 
-// NewFlowCombiner: Creates a new #GstFlowCombiner, use gst_flow_combiner_free() to free it.
-func NewFlowCombiner() *FlowCombiner {
-	cResult := C.gst_flow_combiner_new()
-	return FromGstFlowCombinerUnsafeFull(unsafe.Pointer(cResult))
-}
-

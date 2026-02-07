@@ -10,6 +10,5 @@ extern GstAggregator *                toGstAggregator(void *p);
 extern GstAggregatorPad *             toGstAggregatorPad(void *p);
 extern GstBaseParse *                 toGstBaseParse(void *p);
 extern GstDataQueue *                 toGstDataQueue(void *p);
-extern GstFlowCombiner *              toGstFlowCombiner(void *p);
 
 #endif /* __GST_BINDGEN_BASE_H__ */

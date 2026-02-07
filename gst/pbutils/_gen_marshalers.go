@@ -18,13 +18,6 @@ func init() { registerGeneratedMarshalers() }
 func registerGeneratedMarshalers() {
 	tm := []glib.TypeMarshaler{
 		{T: glib.Type(C.gst_audio_visualizer_get_type()), F: marshalAudioVisualizer},
-		{T: glib.Type(C.gst_discoverer_get_type()), F: marshalDiscoverer},
-		{T: glib.Type(C.gst_discoverer_audio_info_get_type()), F: marshalDiscovererAudioInfo},
-		{T: glib.Type(C.gst_discoverer_container_info_get_type()), F: marshalDiscovererContainerInfo},
-		{T: glib.Type(C.gst_discoverer_info_get_type()), F: marshalDiscovererInfo},
-		{T: glib.Type(C.gst_discoverer_stream_info_get_type()), F: marshalDiscovererStreamInfo},
-		{T: glib.Type(C.gst_discoverer_subtitle_info_get_type()), F: marshalDiscovererSubtitleInfo},
-		{T: glib.Type(C.gst_discoverer_video_info_get_type()), F: marshalDiscovererVideoInfo},
 		{T: glib.Type(C.gst_encoding_audio_profile_get_type()), F: marshalEncodingAudioProfile},
 		{T: glib.Type(C.gst_encoding_container_profile_get_type()), F: marshalEncodingContainerProfile},
 		{T: glib.Type(C.gst_encoding_profile_get_type()), F: marshalEncodingProfile},
@@ -42,48 +35,6 @@ func marshalAudioVisualizer(p unsafe.Pointer) (interface{}, error) {
 	c := C.g_value_get_object(toGValue(p))
 	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
 	return wrapAudioVisualizer(obj), nil
-}
-
-func marshalDiscoverer(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapDiscoverer(obj), nil
-}
-
-func marshalDiscovererAudioInfo(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapDiscovererAudioInfo(obj), nil
-}
-
-func marshalDiscovererContainerInfo(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapDiscovererContainerInfo(obj), nil
-}
-
-func marshalDiscovererInfo(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapDiscovererInfo(obj), nil
-}
-
-func marshalDiscovererStreamInfo(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapDiscovererStreamInfo(obj), nil
-}
-
-func marshalDiscovererSubtitleInfo(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapDiscovererSubtitleInfo(obj), nil
-}
-
-func marshalDiscovererVideoInfo(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapDiscovererVideoInfo(obj), nil
 }
 
 func marshalEncodingAudioProfile(p unsafe.Pointer) (interface{}, error) {

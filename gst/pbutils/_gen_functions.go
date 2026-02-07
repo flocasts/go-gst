@@ -8,7 +8,6 @@ package pbutils
 import "C"
 
 import (
-	"fmt"
 	"unsafe"
 	
 	gst "github.com/go-gst/go-gst/gst"
@@ -508,17 +507,6 @@ func GstPluginsBaseVersionString() string {
 	cResult := C.gst_plugins_base_version_string()
 	defer C.g_free((C.gpointer)(unsafe.Pointer(cResult)))
 	return C.GoString(cResult)
-}
-
-// NewDiscoverer: Creates a new #GstDiscoverer with the provided timeout.
-func NewDiscoverer(timeout unsafe.Pointer) (*Discoverer, error) {
-	var gerr *C.GError
-	cResult := C.gst_discoverer_new(timeout, &gerr)
-	if gerr != nil {
-		defer C.g_error_free(gerr)
-		return nil, fmt.Errorf("%s", C.GoString(gerr.message))
-	}
-	return FromGstDiscovererUnsafeFull(unsafe.Pointer(cResult))
 }
 
 // NewEncodingAudioProfile: Creates a new #GstEncodingAudioProfile  All provided allocatable arguments will be internally cop...

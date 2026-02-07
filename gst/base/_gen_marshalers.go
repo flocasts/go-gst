@@ -22,7 +22,6 @@ func registerGeneratedMarshalers() {
 		{T: glib.Type(C.gst_aggregator_pad_get_type()), F: marshalAggregatorPad},
 		{T: glib.Type(C.gst_base_parse_get_type()), F: marshalBaseParse},
 		{T: glib.Type(C.gst_data_queue_get_type()), F: marshalDataQueue},
-		{T: glib.Type(C.gst_flow_combiner_get_type()), F: marshalFlowCombiner},
 	}
 	glib.RegisterGValueMarshalers(tm)
 }
@@ -59,10 +58,5 @@ func marshalDataQueue(p unsafe.Pointer) (interface{}, error) {
 	c := C.g_value_get_object(toGValue(p))
 	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
 	return wrapDataQueue(obj), nil
-}
-
-func marshalFlowCombiner(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_boxed(toGValue(p))
-	return wrapFlowCombiner((*C.GstFlowCombiner)(unsafe.Pointer(c))), nil
 }
 

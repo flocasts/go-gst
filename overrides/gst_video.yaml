@@ -1,2 +1,5 @@
 package: video
 namespace: GstVideo
+
+skip_types:
+  - ColorBalanceChannel

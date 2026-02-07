@@ -1,2 +1,11 @@
 package: pbutils
 namespace: GstPbutils
+
+skip_types:
+  - Discoverer
+  - DiscovererAudioInfo
+  - DiscovererContainerInfo
+  - DiscovererInfo
+  - DiscovererStreamInfo
+  - DiscovererSubtitleInfo
+  - DiscovererVideoInfo

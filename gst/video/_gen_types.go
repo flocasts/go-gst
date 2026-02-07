@@ -13,35 +13,6 @@ import (
 	"github.com/go-gst/go-glib/glib"
 )
 
-// ColorBalanceChannel:
-// The #GstColorBalanceChannel object represents a parameter
-// for modifying the color balance implemented by an element providing the
-// #GstColorBalance interface. For example, Hue or Saturation.
-type ColorBalanceChannel struct{ *glib.InitiallyUnowned }
-
-func wrapColorBalanceChannel(obj *glib.Object) *ColorBalanceChannel {
-	return &ColorBalanceChannel{&glib.InitiallyUnowned{Object: obj}}
-}
-
-// FromGstColorBalanceChannelUnsafeNone wraps the pointer with transfer-none semantics.
-func FromGstColorBalanceChannelUnsafeNone(ptr unsafe.Pointer) *ColorBalanceChannel {
-	if ptr == nil {
-		return nil
-	}
-	return wrapColorBalanceChannel(glib.TransferNone(ptr))
-}
-
-// FromGstColorBalanceChannelUnsafeFull wraps the pointer with transfer-full semantics.
-func FromGstColorBalanceChannelUnsafeFull(ptr unsafe.Pointer) *ColorBalanceChannel {
-	if ptr == nil {
-		return nil
-	}
-	return wrapColorBalanceChannel(glib.TransferFull(ptr))
-}
-
-// Instance returns the native C GstColorBalanceChannel pointer.
-func (c *ColorBalanceChannel) Instance() *C.GstColorBalanceChannel { return C.toGstColorBalanceChannel(c.Unsafe()) }
-
 // VideoAggregator:
 // VideoAggregator can accept AYUV, ARGB and BGRA video streams. For each of the requested
 // sink pads it will compare the incoming geometry and framerate to define the

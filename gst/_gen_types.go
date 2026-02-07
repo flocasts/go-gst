@@ -13,32 +13,6 @@ import (
 	"github.com/go-gst/go-glib/glib"
 )
 
-// Bitmask: A fundamental type that describes a 64-bit bitmask
-type Bitmask struct{ *glib.InitiallyUnowned }
-
-func wrapBitmask(obj *glib.Object) *Bitmask {
-	return &Bitmask{&glib.InitiallyUnowned{Object: obj}}
-}
-
-// FromGstBitmaskUnsafeNone wraps the pointer with transfer-none semantics.
-func FromGstBitmaskUnsafeNone(ptr unsafe.Pointer) *Bitmask {
-	if ptr == nil {
-		return nil
-	}
-	return wrapBitmask(glib.TransferNone(ptr))
-}
-
-// FromGstBitmaskUnsafeFull wraps the pointer with transfer-full semantics.
-func FromGstBitmaskUnsafeFull(ptr unsafe.Pointer) *Bitmask {
-	if ptr == nil {
-		return nil
-	}
-	return wrapBitmask(glib.TransferFull(ptr))
-}
-
-// Instance returns the native C GstBitmask pointer.
-func (b *Bitmask) Instance() *C.GstBitmask { return C.toGstBitmask(b.Unsafe()) }
-
 // DeviceProviderFactory:
 // #GstDeviceProviderFactory is used to create instances of device providers. A
 // GstDeviceProviderfactory can be added to a #GstPlugin as it is also a
@@ -403,36 +377,6 @@ func FromGstSharedTaskPoolUnsafeFull(ptr unsafe.Pointer) *SharedTaskPool {
 
 // Instance returns the native C GstSharedTaskPool pointer.
 func (s *SharedTaskPool) Instance() *C.GstSharedTaskPool { return C.toGstSharedTaskPool(s.Unsafe()) }
-
-// Tracer:
-// Tracing modules will subclass #GstTracer and register through
-// gst_tracer_register(). Modules can attach to various hook-types - see
-// gst_tracing_register_hook(). When invoked they receive hook specific
-// contextual data, which they must not modify.
-type Tracer struct{ *Object }
-
-func wrapTracer(obj *glib.Object) *Tracer {
-	return &Tracer{wrapObject(obj)}
-}
-
-// FromGstTracerUnsafeNone wraps the pointer with transfer-none semantics.
-func FromGstTracerUnsafeNone(ptr unsafe.Pointer) *Tracer {
-	if ptr == nil {
-		return nil
-	}
-	return wrapTracer(glib.TransferNone(ptr))
-}
-
-// FromGstTracerUnsafeFull wraps the pointer with transfer-full semantics.
-func FromGstTracerUnsafeFull(ptr unsafe.Pointer) *Tracer {
-	if ptr == nil {
-		return nil
-	}
-	return wrapTracer(glib.TransferFull(ptr))
-}
-
-// Instance returns the native C GstTracer pointer.
-func (t *Tracer) Instance() *C.GstTracer { return C.toGstTracer(t.Unsafe()) }
 
 // TracerFactory:
 // Use gst_tracer_factory_get_list() to get a list of tracer factories known to

@@ -17,7 +17,6 @@ func init() { registerGeneratedMarshalers() }
 
 func registerGeneratedMarshalers() {
 	tm := []glib.TypeMarshaler{
-		{T: glib.Type(C.gst_color_balance_channel_get_type()), F: marshalColorBalanceChannel},
 		{T: glib.Type(C.gst_video_aggregator_get_type()), F: marshalVideoAggregator},
 		{T: glib.Type(C.gst_video_aggregator_convert_pad_get_type()), F: marshalVideoAggregatorConvertPad},
 		{T: glib.Type(C.gst_video_aggregator_pad_get_type()), F: marshalVideoAggregatorPad},
@@ -35,12 +34,6 @@ func registerGeneratedMarshalers() {
 
 func toGValue(p unsafe.Pointer) *C.GValue {
 	return (*C.GValue)(p)
-}
-
-func marshalColorBalanceChannel(p unsafe.Pointer) (interface{}, error) {
-	c := C.g_value_get_object(toGValue(p))
-	obj := &glib.Object{GObject: glib.ToGObject(unsafe.Pointer(c))}
-	return wrapColorBalanceChannel(obj), nil
 }
 
 func marshalVideoAggregator(p unsafe.Pointer) (interface{}, error) {

@@ -2,7 +2,6 @@
 
 #include "_gen_chelpers.go.h"
 
-GstColorBalanceChannel *       toGstColorBalanceChannel(void *p) { return (GST_COLOR_BALANCE_CHANNEL(p)); }
 GstVideoAggregator *           toGstVideoAggregator(void *p) { return (GST_VIDEO_AGGREGATOR(p)); }
 GstVideoAggregatorConvertPad * toGstVideoAggregatorConvertPad(void *p) { return (GST_VIDEO_AGGREGATOR_CONVERT_PAD(p)); }
 GstVideoAggregatorPad *        toGstVideoAggregatorPad(void *p) { return (GST_VIDEO_AGGREGATOR_PAD(p)); }

@@ -6,7 +6,6 @@
 #include "gst.go.h"
 
 extern GstAtomicQueue *               toGstAtomicQueue(void *p);
-extern GstBitmask *                   toGstBitmask(void *p);
 extern GstDateTime *                  toGstDateTime(void *p);
 extern GstDeviceProviderFactory *     toGstDeviceProviderFactory(void *p);
 extern GstDoubleRange *               toGstDoubleRange(void *p);
@@ -20,7 +19,6 @@ extern GstMetaFactory *               toGstMetaFactory(void *p);
 extern GstParamArray *                toGstParamArray(void *p);
 extern GstParamFraction *             toGstParamFraction(void *p);
 extern GstSharedTaskPool *            toGstSharedTaskPool(void *p);
-extern GstTracer *                    toGstTracer(void *p);
 extern GstTracerFactory *             toGstTracerFactory(void *p);
 extern GstTracerRecord *              toGstTracerRecord(void *p);
 extern GstValueArray *                toGstValueArray(void *p);

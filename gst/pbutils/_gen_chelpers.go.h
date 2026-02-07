@@ -6,13 +6,6 @@
 #include "gst.go.h"
 
 extern GstAudioVisualizer *           toGstAudioVisualizer(void *p);
-extern GstDiscoverer *                toGstDiscoverer(void *p);
-extern GstDiscovererAudioInfo *       toGstDiscovererAudioInfo(void *p);
-extern GstDiscovererContainerInfo *   toGstDiscovererContainerInfo(void *p);
-extern GstDiscovererInfo *            toGstDiscovererInfo(void *p);
-extern GstDiscovererStreamInfo *      toGstDiscovererStreamInfo(void *p);
-extern GstDiscovererSubtitleInfo *    toGstDiscovererSubtitleInfo(void *p);
-extern GstDiscovererVideoInfo *       toGstDiscovererVideoInfo(void *p);
 extern GstEncodingAudioProfile *      toGstEncodingAudioProfile(void *p);
 extern GstEncodingContainerProfile *  toGstEncodingContainerProfile(void *p);
 extern GstEncodingProfile *           toGstEncodingProfile(void *p);

@@ -5,7 +5,6 @@
 
 #include "gst.go.h"
 
-extern GstColorBalanceChannel *       toGstColorBalanceChannel(void *p);
 extern GstVideoAggregator *           toGstVideoAggregator(void *p);
 extern GstVideoAggregatorConvertPad * toGstVideoAggregatorConvertPad(void *p);
 extern GstVideoAggregatorPad *        toGstVideoAggregatorPad(void *p);
