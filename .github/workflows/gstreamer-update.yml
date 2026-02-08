@@ -104,7 +104,7 @@ jobs:
             -Dgst-plugins-bad:srtp=enabled \
             -Dlibnice=enabled
           meson compile -C builddir
-          sudo meson install -C builddir
+          meson install -C builddir --destdir /tmp/gstreamer-install
 
       - name: Set up Go
         if: steps.version.outputs.changed == 'true'
@@ -125,7 +125,7 @@ jobs:
       - name: Update GIR files
         if: steps.version.outputs.changed == 'true'
         run: |
-          GIR_SRC="/usr/share/gir-1.0"
+          GIR_SRC="/tmp/gstreamer-install/usr/share/gir-1.0"
           MISSING=0
           for f in gir-files/*.gir; do
             BASENAME=$(basename "$f")
@@ -263,4 +263,4 @@ jobs:
         if: always()
         run: |
           rm -f gst-bindgen
-          rm -rf /tmp/gstreamer_src /tmp/old-gst
+          rm -rf /tmp/gstreamer_src /tmp/old-gst /tmp/gstreamer-install
